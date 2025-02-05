@@ -1,0 +1,51 @@
+# General
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Virtual Environment
+venv/
+.env
+*.env
+
+# Django
+/db.sqlite3
+/db.sqlite3-journal
+/media/
+/staticfiles/
+
+# Migrations (Optional, if you regenerate them often)
+**/migrations/*.pyc
+**/migrations/*.py
+!**/migrations/__init__.py
+
+# Logs & Debug Files
+logs/
+*.log
+*.out
+*.pid
+*.swp
+
+# IDE & Editor Specific Files
+.vscode/
+.idea/
+*.sublime-workspace
+
+# Dependencies
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Coverage & Testing
+.coverage
+htmlcov/
+*.cover
+*.py,cover
+.nosetests
+
+# Docker
+*.dockerignore
+
+# MacOS & Windows System Files
+.DS_Store
+Thumbs.db
