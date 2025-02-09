@@ -10,5 +10,7 @@ urlpatterns = [
 
     # Post Endpoints
     path('post/category/list/', api_views.CategoryListAPIView.as_view()),
-    path('post/category/posts/<str:category_slug>/', api_views.PostCategoryListAPIView.as_view()),
+    path('post/category/posts/<category_slug>/', api_views.PostCategoryListAPIView.as_view()),
+    path('post/list/', api_views.PostListAPIView.as_view()),
+    path('post/detail/<slug>/', api_views.PostDetailAPIView.as_view()),
 ]

@@ -61,7 +61,24 @@ class PostCategoryListAPIView(generics.ListAPIView):
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        category = self.kwargs['category_slug']
-        category = api_models.Category.objects.get(slug=category)
-        posts = api_models.Post.objects.filter(category=category, status='Active')
-        return posts
+        category_slug = self.kwargs['category_slug']
+        category = api_models.Category.objects.get(slug=category_slug)
+        return api_models.Post.objects.filter(category=category, status='Active')
+    
+class PostListAPIView(generics.ListAPIView):
+    serializer_class = api_serializers.PostSerializer
+    permission_classes = [AllowAny]
+
+    def get(self, request, *args, **kwargs):
+        return api_models.Post.objests.filter(status='Active')
+    
+class PostDetailAPIView(generics.RetrieveAPIView):
+    serializer_class = api_serializers.PostSerializer
+    permission_classes = [AllowAny]
+
+    def get_object(self):
+        slug = self.kwargs['slug']
+        post = api_models.Post.objects.get(slug=slug, status='Active')
+        post.views += 1
+        post.save()
+        return post
