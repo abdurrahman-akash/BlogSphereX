@@ -28,5 +28,40 @@ import random
 
 # Custom Imports
 from api import models as api_models
-from api import serializers as api_serializers
+from api import serializer as api_serializers
 
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = api_serializers.MyTokenObtainPairSerializer
+
+class RegisterView(generics.CreateAPIView):
+    queryset = api_models.CustomUser.objects.all()
+    permission_classes = [AllowAny]
+    serializer_class = api_serializers.RegisterSerializer
+
+class ProfileView(generics.RetrieveUpdateAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = api_serializers.ProfileSerializer
+
+    def get_object(self):
+        user_id = self.kwargs['user_id']
+        user = api_models.CustomUser.objects.get(id=user_id)
+        profile = api_models.Profile.objects.get(user=user)
+        return profile
+
+# Post APIs Endpoints
+class CategoryListAPIView(generics.ListAPIView):
+    serializer_class = api_serializers.CategorySerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        return api_models.Category.objects.all()
+    
+class PostCategoryListAPIView(generics.ListAPIView):
+    serializer_class = api_serializers.PostSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        category = self.kwargs['category_slug']
+        category = api_models.Category.objects.get(slug=category)
+        posts = api_models.Post.objects.filter(category=category, status='Active')
+        return posts

@@ -19,7 +19,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(write_only=True, required=True)
 
     class Meta:
-        models = api_models.CustomUser
+        model = api_models.CustomUser
         fields = ['full_name', 'email', 'password', 'password2']
 
     def validate(self, attrs):
@@ -29,7 +29,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         return attrs
     
     def create(self, validated_data):
-        user = api_models.CustomUser.object.create(
+        user = api_models.CustomUser.objects.create(
             full_name=validated_data['full_name'],
             email=validated_data['email']
         )
@@ -45,7 +45,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = api_models.CustomUser
-    fields = "__all__"
+        fields = "__all__"
 
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
