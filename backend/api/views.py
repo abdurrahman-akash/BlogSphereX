@@ -82,3 +82,24 @@ class PostDetailAPIView(generics.RetrieveAPIView):
         post.views += 1
         post.save()
         return post
+
+class LikePostAPIView(APIView):
+    def post(self, request):
+        user_id = request.data['user_id']
+        post_id = request.data['post_id']
+
+        user = api.models.CustomUser.objects.get(id=user_id)
+        post = api.models.Post.objects.get(id=post_id)
+
+        if user in post.likes.all():
+            post.likes.remove(user)
+            return Response({'message': 'Post Unliked'}, status=status.HTTP_200_OK)
+        else:
+            post.likes.add(user)
+            
+            api_models.Notification.objects.create(
+                user=post.user,
+                post=post,
+                type='Like',
+            )
+            return Response({'message': 'Post Liked'}, status=status.HTTP_200_OK)
