@@ -84,12 +84,21 @@ class PostDetailAPIView(generics.RetrieveAPIView):
         return post
 
 class LikePostAPIView(APIView):
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'user_id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                'post_id': openapi.Schema(type=openapi.TYPE_INTEGER),
+            }
+        )
+    )
     def post(self, request):
         user_id = request.data['user_id']
         post_id = request.data['post_id']
 
-        user = api.models.CustomUser.objects.get(id=user_id)
-        post = api.models.Post.objects.get(id=post_id)
+        user = api_models.CustomUser.objects.get(id=user_id)
+        post = api_models.Post.objects.get(id=post_id)
 
         if user in post.likes.all():
             post.likes.remove(user)
