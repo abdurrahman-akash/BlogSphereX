@@ -15,6 +15,7 @@ urlpatterns = [
     path('post/detail/<slug>/', api_views.PostDetailAPIView.as_view()),
     path('post/like/', api_views.LikePostAPIView.as_view()),
     path('post/comment/', api_views.PostCommentAPIView.as_view()),
+    path('post/bookmark/', api_views.BookmarkPostAPIView.as_view()),
 ]
 
 {
