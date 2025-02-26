@@ -17,11 +17,13 @@ urlpatterns = [
     path('post/comment/', api_views.PostCommentAPIView.as_view()),
     path('post/bookmark/', api_views.BookmarkPostAPIView.as_view()),
 
-    # User Endpoints
+    # Dashboard Endpoints
     path('author/dashboard/stats/<user_id>/', api_views.DashboardStats.as_view()),
-]
+    path('author/dashboard/comment-list/<user_id>/', api_views.DashboardCommentLists.as_view()),
+    path('author/dashboard/notification-list/<user_id>/', api_views.DashboardNotificationLists.as_view()),
+    path('author/dashboard/notification-mark-seen/', api_views.DashboardMarkNotificationAsSeen.as_view()),
+    path('author/dashboard/reply-comment/', api_views.DashboardReplyCommentAPIView.as_view()),
 
-{
-    "User_id": "1",
-    "Post_id": "1",
-}
+    # Dashboard Post Endpoints
+    path('author/dashboard/create-post/', api_views.DashboardPostCreateAPIView.as_view()),
+]

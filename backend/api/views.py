@@ -207,3 +207,98 @@ class DashboardStats(generics.ListAPIView):
         
         return Response(data)
     
+class DashboardPostLists(generics.ListAPIView):
+    serializer_class = api_serializers.PostSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        user = api_models.CustomUser.objects.get(id=user_id)
+        return api_models.Post.objects.filter(user=user).order_by('-id')
+    
+class DashboardCommentLists(generics.ListAPIView):
+    serializer_class = api_serializers.CommentSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        user = api_models.CustomUser.objects.get(id=user_id)
+        return api_models.Comment.objects.filter(post__user=user).order_by('-id')
+    
+class DashboardNotificationLists(generics.ListAPIView):
+    serializer_class = api_serializers.NotificationSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        user = api_models.CustomUser.objects.get(id=user_id)
+        return api_models.Comment.objects.all(seen=False, user=user)
+    
+class DashboardMarkNotificationAsSeen(APIView):
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'noti_id': openapi.Schema(type=openapi.TYPE_INTEGER),
+            }
+        )
+    )
+    def post(self, request):
+        noti_id = request.data['noti_id']
+        user = api_models.CustomUser.objects.get(id=noti_id)
+        notifications = api_models.Notification.objects.filter(user=user, seen=False)
+        for notification in notifications:
+            notification.seen = True
+            notification.save()
+        return Response({'message': 'Notifications Marked as Seen'}, status=status.HTTP_200_OK)
+    
+class DashboardReplyCommentAPIView(APIView):
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'comment_id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                'reply': openapi.Schema(type=openapi.TYPE_STRING),
+            }
+        )
+    )
+
+    def post(self, request):
+        comment_id = request.data['comment_id']
+        reply = request.data['reply']
+
+        comment = api_models.Comment.objects.get(id=comment_id)
+        comment.reply = reply
+        comment.save()
+
+        return Response({'message': 'Comment Replied'}, status=status.HTTP_200_OK)
+    
+class DashboardPostCreateAPIView(generics.CreateAPIView):
+    serializer_class = api_serializers.PostSerializer
+    permission_classes = [AllowAny]
+
+    def create(self, request, *args, **kwargs):
+        print(request.data)
+
+        user_id = request.data.get('user_id')
+        title = request.data.get('title')
+        image = request.data.get('image')
+        content = request.data.get('content')
+        tags = request.data.get('tags')
+        category_id = request.data.get('category')
+        post_status = request.data.get('post_status', 'Active')
+
+        user = api_models.CustomUser.objects.get(id=user_id)
+        category = api_models.Category.objects.get(id=category_id)
+
+        api_models.Post.objects.create(
+            user=user,
+            category=category,
+            title=title,
+            image=image,
+            content=content,
+            tags=tags,
+            status=post_status,
+        )
+
+        return Response({'message': 'Post Created Successfully'}, status=status.HTTP_200_OK)
