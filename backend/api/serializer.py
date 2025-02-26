@@ -117,3 +117,7 @@ class AuthorSerializer(serializers.ModelSerializer):
     post = serializers.IntegerField(default=0)
     likes = serializers.IntegerField(default=0)
     bookmarks = serializers.IntegerField(default=0)
+
+    class Meta:
+        model = api_models.CustomUser
+        fields = ['views', 'post', 'likes', 'bookmarks']

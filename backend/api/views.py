@@ -43,9 +43,10 @@ class ProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = api_serializers.ProfileSerializer
 
     def get_object(self):
+        from django.shortcuts import get_object_or_404
         user_id = self.kwargs['user_id']
-        user = api_models.CustomUser.objects.get(id=user_id)
-        profile = api_models.Profile.objects.get(user=user)
+        user = get_object_or_404(api_models.CustomUser, id=user_id)
+        profile = get_object_or_404(api_models.Profile, user=user)
         return profile
 
 # Post APIs Endpoints
@@ -69,8 +70,8 @@ class PostListAPIView(generics.ListAPIView):
     serializer_class = api_serializers.PostSerializer
     permission_classes = [AllowAny]
 
-    def get(self, request, *args, **kwargs):
-        return api_models.Post.objests.filter(status='Active')
+    def get(self, *args, **kwargs):
+        return api_models.Post.objects.filter(status='Active')
     
 class PostDetailAPIView(generics.RetrieveAPIView):
     serializer_class = api_serializers.PostSerializer
@@ -178,3 +179,31 @@ class BookmarkPostAPIView(APIView):
                 type = 'Bookmark',
             )
             return Response({'message': 'Post Bookmarked'}, status=status.HTTP_200_OK)
+
+class DashboardStats(generics.ListAPIView):
+    serializer_class = api_serializers.AuthorSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        user = api_models.CustomUser.objects.filter(id=user_id)
+        return user
+
+    def list(self, *args, **kwargs):
+        queryset = self.get_queryset()
+        user = queryset.first()
+        
+        views = api_models.Post.objects.filter(user=user).aggregate(Sum('views'))['views__sum']
+        posts = api_models.Post.objects.filter(user=user).count()
+        likes = api_models.Post.objects.filter(user=user).aggregate(Sum('likes'))['likes__sum']
+        bookmarks = api_models.Bookmark.objects.filter(post__user=user).count()
+
+        data = {
+            'views': views,
+            'posts': posts,
+            'likes': likes,
+            'bookmarks': bookmarks,
+        }
+        
+        return Response(data)
+    
