@@ -26,4 +26,5 @@ urlpatterns = [
 
     # Dashboard Post Endpoints
     path('author/dashboard/create-post/', api_views.DashboardPostCreateAPIView.as_view()),
+    path('author/dashboard/update-post/<user_id>/<post_id>/', api_views.DashboardPostUpdateAPIView.as_view()),
 ]
